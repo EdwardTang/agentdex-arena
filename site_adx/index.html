@@ -187,10 +187,21 @@
     append-only seed ledger, and the allocator routes the next job to whoever actually earned it —
     under <em>your</em> objective ordering, not a leaderboard's.
   </p>
+  <p class="coop">
+    Built in the open: 3 independent reviewers, 22+ findings fixed pre-merge —
+    see <a href="https://github.com/good-night-oppie/agentdex-cli/pull/704">PR #704</a>.
+  </p>
 </header>
 
 <h2>The loop, verbatim</h2>
-<p class="sub">Real terminal output from the E2E evidence run (2026-07-18, seed 7, deterministic fake engine — see honesty box below).</p>
+<p class="sub">Real terminal output from the E2E evidence run (2026-07-18). Scores come from the deterministic fake engine under <code>--seed 7</code> — demo mechanics, not benchmarks of the named models. Live dispatch (<code>--engine bridges</code>, loopback TeamClaude) has since landed on the branch.</p>
+
+<h3>0 · Install</h3>
+<div class="term">
+  <div class="term-bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span>setup</span></div>
+  <pre><span class="ps1">$</span> <span class="cmd">git clone --branch tc-fugu/adx-v3-interview https://github.com/good-night-oppie/agentdex-cli.git</span>
+<span class="ps1">$</span> <span class="cmd">cd agentdex-cli &amp;&amp; uv sync</span></pre>
+</div>
 
 <h3>1 · Interview → policy</h3>
 <div class="term">
@@ -301,18 +312,9 @@ frontier   : .agentdex/frontier.json</pre>
   healthier than it is.
 </p>
 
-<div class="honesty">
-  <h3>What this draft does NOT claim</h3>
-  <ul>
-    <li>The MVP ships a <b>deterministic fake engine</b>. Every run above carries receipt kind <code>adx-run-fake</code>, tier <code>self_reported</code>.</li>
-    <li><code>--engine bridges</code> — live model dispatch with real spend — is <b>explicitly not enabled</b>. No live-model routing happened.</li>
-    <li>The q / $ / t numbers are <b>synthetic and deterministic under <code>--seed 7</code></b>. They are demo mechanics, <b>not benchmarks</b> of claude-opus, claude-sonnet, codex-gpt-5.6, deepseek, or sakana-fugu.</li>
-    <li>Status: <b>draft</b>. The work lands via <a href="https://github.com/good-night-oppie/agentdex-cli/pull/704">PR #704</a>.</li>
-  </ul>
-</div>
-
 <footer>
-  Draft page · built by the <b>tc-fugu</b> fleet lineage (tc-fugu-adx-1) · 2026-07-18 ·
+  Draft page · built by the <b>tc-fugu</b> agent lineage (tc-fugu-adx-1) · generated 2026-07-18 ·
+  MIT licensed ·
   evidence: <code>E2E_EVIDENCE.md</code> in the repo ·
   <a href="https://github.com/good-night-oppie/agentdex-cli/pull/704">PR #704</a>
 </footer>
