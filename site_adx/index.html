@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentDex CLI v3 — draft</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-panel: #161b22;
+    --bg-term: #0a0e14;
+    --fg: #e6edf3;
+    --fg-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #7ee787;
+    --warn: #d29922;
+    --border: #30363d;
+    --mono: "SFMono-Regular", "JetBrains Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  :root { color-scheme: dark; }
+  @media (prefers-color-scheme: light) {
+    :root {
+      color-scheme: light;
+      --bg: #f6f8fa;
+      --bg-panel: #ffffff;
+      --bg-term: #0a0e14; /* terminals stay dark in light mode */
+      --fg: #1f2328;
+      --fg-dim: #59636e;
+      --accent: #0969da;
+      --accent2: #1a7f37;
+      --warn: #9a6700;
+      --border: #d1d9e0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 64px 0 40px; }
+  .draft-banner {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--warn);
+    border: 1px solid var(--warn);
+    border-radius: 4px;
+    padding: 2px 10px;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+  h1 {
+    font-size: 40px;
+    margin: 0 0 10px;
+    letter-spacing: -0.5px;
+  }
+  h1 .v { color: var(--accent); }
+  .tagline {
+    font-size: 20px;
+    color: var(--fg-dim);
+    margin: 0 0 8px;
+  }
+  .tagline b { color: var(--fg); font-weight: 600; }
+  .coop {
+    font-size: 15px;
+    color: var(--fg-dim);
+    max-width: 640px;
+  }
+  h2 {
+    font-size: 24px;
+    margin: 56px 0 6px;
+    letter-spacing: -0.3px;
+  }
+  h3 { font-size: 17px; margin: 28px 0 6px; }
+  .sub { color: var(--fg-dim); margin: 0 0 18px; font-size: 15px; }
+  p { font-size: 15px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .term {
+    background: var(--bg-term);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 14px 0 26px;
+    overflow: hidden;
+  }
+  .term { color-scheme: dark; }
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid #30363d; /* terminal stays dark in both themes */
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #8b949e;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; opacity: 0.85; }
+  .dot.r { background: #ff5f56; } .dot.y { background: #ffbd2e; } .dot.g { background: #27c93f; }
+  .term-bar span { margin-left: 8px; }
+  .term pre {
+    margin: 0;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.55;
+    color: #c9d1d9;
+  }
+  .term .ps1 { color: #7ee787; }
+  .term .cmd { color: #e6edf3; font-weight: 600; }
+  .term .win { color: #7ee787; }
+  .term .warn { color: #d29922; }
+  .term .dim { color: #6e7681; }
+  .term .hl { color: #58a6ff; }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .card h4 { margin: 0 0 6px; font-size: 15px; }
+  .card p { margin: 0; font-size: 13.5px; color: var(--fg-dim); }
+  .card .step { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+  .honesty {
+    background: var(--bg-panel);
+    border: 1px solid var(--warn);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 18px 0;
+  }
+  .honesty h3 { margin-top: 0; color: var(--warn); }
+  .honesty ul { margin: 8px 0 0; padding-left: 20px; }
+  .honesty li { font-size: 14.5px; margin: 6px 0; }
+  table {
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 14px 0 8px;
+  }
+  td, th {
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    text-align: left;
+  }
+  th { background: var(--bg-panel); font-weight: 600; }
+  .st-ready { color: var(--accent2); }
+  .st-unprobed { color: var(--fg-dim); }
+  footer {
+    margin-top: 72px;
+    padding: 26px 0 44px;
+    border-top: 1px solid var(--border);
+    color: var(--fg-dim);
+    font-size: 13.5px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="draft-banner">DRAFT — deterministic fake engine · not live model routing</div>
+  <h1>AgentDex CLI <span class="v">v3</span></h1>
+  <p class="tagline"><b>Know which model does a job better</b> → <b>get the job done</b> → <b>learn a seed</b>.</p>
+  <p class="coop">
+    Your model subscriptions aren't gladiators — they're a roster. AgentDex treats the pool as
+    <em>co-opetition</em>: every model gets a fair shot at each job signature, results feed an
+    append-only seed ledger, and the allocator routes the next job to whoever actually earned it —
+    under <em>your</em> objective ordering, not a leaderboard's.
+  </p>
+</header>
+
+<h2>The loop, verbatim</h2>
+<p class="sub">Real terminal output from the E2E evidence run (2026-07-18, seed 7, deterministic fake engine — see honesty box below).</p>
+
+<h3>1 · Interview → policy</h3>
+<div class="term">
+  <div class="term-bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span>adx interview</span></div>
+  <pre><span class="ps1">$</span> <span class="cmd">uv run --package agentdex-cli adx interview --non-interactive</span>
+wrote orchestration policy → .agentdex/orchestration.yaml
+next: `adx run &lt;task&gt;` will dispatch per this policy and learn seeds.</pre>
+</div>
+
+<h3>2 · Openbox → probe the roster</h3>
+<div class="term">
+  <div class="term-bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span>adx openbox check</span></div>
+  <pre><span class="ps1">$</span> <span class="cmd">uv run --package agentdex-cli adx openbox check --json</span>
+claude-opus    <span class="win">READY</span>     subscription-cli
+claude-sonnet  <span class="win">READY</span>     subscription-cli
+codex-gpt-5.6  <span class="win">READY</span>     subscription-cli
+deepseek       <span class="dim">UNPROBED</span>  subscription-cli
+sakana-fugu    <span class="dim">UNPROBED</span>  subscription-cli
+pool coverage: 3/5 pool names have a READY backend
+{"backends": {"claude-opus": "READY", "claude-sonnet": "READY", "codex-gpt-5.6": "READY", "deepseek": "UNPROBED", "sakana-fugu": "UNPROBED"}, "pool_covered": false}
+<span class="warn">exit 1</span> <span class="dim"># partial coverage is an honest non-zero exit, by design</span></pre>
+</div>
+
+<h3>3 · Run → cold-start fanout</h3>
+<div class="term">
+  <div class="term-bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span>adx run — cold start</span></div>
+  <pre><span class="ps1">$</span> <span class="cmd">uv run --package agentdex-cli adx run "bugfix: demo the loop" --seed 7</span>
+task      : bugfix: demo the loop
+signature : bugfix
+allocation: <span class="hl">cold-start-fanout</span>  (4 candidate(s))
+objective  : correctness &gt; cost &gt; latency
+  q=0.8415 $=0.4329 t=113.2s  claude-opus  <span class="win">&lt;- winner</span>
+  q=0.7321 $=0.2928 t=30.2s  claude-sonnet
+  q=0.3817 $=0.5340 t=75.7s  codex-gpt-5.6
+  q=0.5297 $=0.1426 t=21.9s  deepseek
+winner    : <span class="win">claude-opus</span>  (q=0.8415 $=0.4329 t=113.2s)
+learned   : next 'bugfix' will prefer -&gt; claude-opus
+frontier   : .agentdex/frontier.json</pre>
+</div>
+
+<h3>4 · Run again → exploit the learned seed</h3>
+<div class="term">
+  <div class="term-bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span>adx run — exploit</span></div>
+  <pre><span class="ps1">$</span> <span class="cmd">uv run --package agentdex-cli adx run "bugfix: second pass" --seed 7</span>
+task      : bugfix: second pass
+signature : bugfix
+allocation: <span class="hl">exploit</span>  (1 candidate(s))
+objective  : correctness &gt; cost &gt; latency
+  q=0.8897 $=0.4329 t=113.2s  claude-opus  <span class="win">&lt;- winner</span>
+winner    : <span class="win">claude-opus</span>  (q=0.8897 $=0.4329 t=113.2s)
+learned   : next 'bugfix' will prefer -&gt; claude-opus
+frontier   : .agentdex/frontier.json</pre>
+</div>
+
+<h3>5 · Flip the objective → the winner flips</h3>
+<p class="sub">Same seed ledger. Only the policy's objective order changed: <code>correctness &gt; cost &gt; latency</code> became <code>cost &gt; correctness &gt; latency</code>.</p>
+<div class="term">
+  <div class="term-bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span>adx run — cost-first</span></div>
+  <pre><span class="ps1">$</span> <span class="cmd">uv run --package agentdex-cli adx run "bugfix: objective flip demo" --seed 7</span>
+task      : bugfix: objective flip demo
+signature : bugfix
+allocation: <span class="hl">exploit</span>  (1 candidate(s))
+objective  : <span class="hl">cost &gt; correctness &gt; latency</span>
+  q=0.6143 $=0.1426 t=21.9s  deepseek  <span class="win">&lt;- winner</span>
+winner    : <span class="win">deepseek</span>  (q=0.6143 $=0.1426 t=21.9s)
+learned   : next 'bugfix' will prefer -&gt; deepseek
+frontier   : .agentdex/frontier.json</pre>
+</div>
+
+<h2>How it works</h2>
+<div class="cards">
+  <div class="card">
+    <span class="step">1 — prune</span>
+    <h4>Constrained-Pareto selection</h4>
+    <p>Candidates violating hard constraints (cost ceilings, banned models) are pruned first. Survivors are reduced to the non-dominated set, then ranked by <em>your</em> objective order — correctness-first and cost-first policies pick different winners from the same data.</p>
+  </div>
+  <div class="card">
+    <span class="step">2 — learn</span>
+    <h4>Append-only seed ledger</h4>
+    <p>Every run appends a seed record (signature, model, scores, timestamp) to <code>.agentdex/seeds.jsonl</code>. Nothing is rewritten; allocation state is always replayable. Frontier math delegates to the <code>adx_frontier</code> package.</p>
+  </div>
+  <div class="card">
+    <span class="step">3 — export</span>
+    <h4>frontier.json partitions</h4>
+    <p>The learned state exports as <code>.agentdex/frontier.json</code>: one partition per job ladder (e.g. <code>job:bugfix</code>) holding the non-dominated candidates with scores and receipts. Dominated candidates fall off the frontier.</p>
+  </div>
+</div>
+
+<h2>Openbox: zero credential value</h2>
+<p class="sub">The backend registry never holds a secret value — only a reference.</p>
+<p>
+  Each backend entry carries a <code>token_ref</code> that is one of
+  <code>none</code>, <code>env:NAME</code>, or <code>file:/path</code>. Secrets are resolved at
+  point of use and never written into config, logs, or exports. <code>adx openbox check</code>
+  probes each backend and reports an honest status:
+</p>
+<table>
+  <tr><th>status</th><th>meaning</th></tr>
+  <tr><td class="st-ready">READY</td><td>probe command succeeded (e.g. the CLI is installed and answers)</td></tr>
+  <tr><td class="st-unprobed">UNPROBED</td><td>no probe configured for this backend yet — unknown, not assumed working</td></tr>
+  <tr><td class="st-unprobed">MISSING</td><td>probe binary not found on this host</td></tr>
+  <tr><td class="st-unprobed">NO-AUTH</td><td>probe ran but the backend refused — credentials not in place</td></tr>
+  <tr><td class="st-unprobed">TIMEOUT</td><td>probe did not answer within the probe timeout</td></tr>
+</table>
+<p class="sub">Only READY and UNPROBED appear in the evidence run above — the other three did not occur on this host.</p>
+<p>
+  Partial pool coverage exits non-zero on purpose: the tool refuses to pretend a roster is
+  healthier than it is.
+</p>
+
+<div class="honesty">
+  <h3>What this draft does NOT claim</h3>
+  <ul>
+    <li>The MVP ships a <b>deterministic fake engine</b>. Every run above carries receipt kind <code>adx-run-fake</code>, tier <code>self_reported</code>.</li>
+    <li><code>--engine bridges</code> — live model dispatch with real spend — is <b>explicitly not enabled</b>. No live-model routing happened.</li>
+    <li>The q / $ / t numbers are <b>synthetic and deterministic under <code>--seed 7</code></b>. They are demo mechanics, <b>not benchmarks</b> of claude-opus, claude-sonnet, codex-gpt-5.6, deepseek, or sakana-fugu.</li>
+    <li>Status: <b>draft</b>. The work lands via <a href="https://github.com/good-night-oppie/agentdex-cli/pull/704">PR #704</a>.</li>
+  </ul>
+</div>
+
+<footer>
+  Draft page · built by the <b>tc-fugu</b> fleet lineage (tc-fugu-adx-1) · 2026-07-18 ·
+  evidence: <code>E2E_EVIDENCE.md</code> in the repo ·
+  <a href="https://github.com/good-night-oppie/agentdex-cli/pull/704">PR #704</a>
+</footer>
+
+</div>
+</body>
+</html>

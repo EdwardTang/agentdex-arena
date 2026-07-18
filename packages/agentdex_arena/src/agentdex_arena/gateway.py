@@ -2854,6 +2854,19 @@ def create_app(
 
         app.mount("/bene", StaticFiles(directory=str(_bene_site), html=True), name="bene")
 
+    # AgentDex CLI v3 landing (static). Mounted only when the site_adx/ tree was
+    # bundled into the image — same presence-gated pattern and root-relative
+    # redirect rationale as the /bene mount above.
+    _adx_site = Path("site_adx")
+    if _adx_site.is_dir():
+        from fastapi.responses import RedirectResponse as _AdxRedirect
+
+        @app.get("/adx", include_in_schema=False)
+        async def _adx_trailing_slash() -> _AdxRedirect:
+            return _AdxRedirect(url="/adx/", status_code=308)
+
+        app.mount("/adx", StaticFiles(directory=str(_adx_site), html=True), name="adx")
+
     return app
 
 

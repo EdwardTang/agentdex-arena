@@ -45,6 +45,9 @@ RUN echo "bene /bene/ site rev: ${BENE_SITE_REV}"
 # BENE landing + docs (static, served at /bene/ by the gateway when present).
 COPY site/ ./site/
 
+# AgentDex CLI v3 landing (static, served at /adx/ by the gateway when present).
+COPY site_adx/ ./site_adx/
+
 # agentdex landing (static, served at / for browsers by the gateway when present).
 COPY web/ ./web/
 
