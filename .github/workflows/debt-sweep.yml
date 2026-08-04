@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
 jobs:
   sweep:
-    runs-on: [self-hosted, linux, x64]
+    # Use GitHub-hosted capacity: this public repo has no attached self-hosted runner,
+    # so the old [self-hosted, linux, x64] label left scheduled runs queued indefinitely.
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
